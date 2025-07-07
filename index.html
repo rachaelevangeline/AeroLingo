@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AeroLingo – Decode ATC Language</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>🛫 AeroLingo</h1>
+    <p>Understand ATC and pilot phraseology with AI-powered explanations.</p>
+  </header>
+
+  <section class="translator">
+    <h2>🎙️ ATC Phrase Decoder</h2>
+    <p>Paste an ATC message or ICAO phrase below:</p>
+    <textarea id="atcInput" rows="4" placeholder="e.g., Cleared ILS 27L, maintain 3000 until established..."></textarea>
+    <br>
+    <button onclick="decodeATC()">Explain Phrase</button>
+    <div id="explanationOutput"></div>
+  </section>
+
+  <footer>
+    <p>Built for student pilots, simmers, and anyone learning aviation communication ✈️</p>
+  </footer>
+
+  <!-- Load external JS file -->
+  <script src="script.js"></script>
+</body>
+</html>
