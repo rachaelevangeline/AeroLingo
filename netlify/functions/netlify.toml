@@ -1,0 +1,14 @@
+[build]
+  # This line tells Netlify where your website's static files are.
+  # If index.html, styles.css, script.js are in the root of your repo, use "."
+  publish = "."
+  # Uncomment the command below if your site has NO explicit build command (like 'npm run build' for JS projects).
+  # If you just have HTML/CSS/JS in your root, this is likely what you need.
+  # command = "echo 'No build command needed for static site'" 
+
+[functions]
+  # This tells Netlify where to find your serverless functions (like your Python 'decode.py')
+  directory = "netlify/functions"
+  # Optional: You can specify a Python version if you want.
+  # Netlify will use a stable default (e.g., Python 3.9, 3.10, or newer) if not specified.
+  # python_version = "3.9"
