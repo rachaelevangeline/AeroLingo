@@ -1,7 +1,7 @@
 # netlify/functions/decode.py
 import os
 import json
-from openai import OpenAI # Using OpenAI as per your previous choice and code structure
+import google.generativeai as genai # We will need to install this library
 
 def handler(event, context):
     # Ensure it's a POST request
@@ -31,31 +31,40 @@ def handler(event, context):
         }
 
     # Access the API Key securely from Netlify's Environment Variables
-    OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+    # This name (GEMINI_API_KEY) must match what you set in Netlify!
+    GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
-    if not OPENAI_API_KEY:
-        print("ERROR: OPENAI_API_KEY is not set in Netlify environment variables.")
+    if not GEMINI_API_KEY:
+        print("ERROR: GEMINI_API_KEY is not set in Netlify environment variables.")
         return {
             'statusCode': 500,
             'headers': { "Content-Type": "application/json" },
             'body': json.dumps({"error": "Server configuration error: API key not found. Please contact support."})
         }
 
-    # Initialize OpenAI client and make the API call
+    # Configure Google Generative AI
+    genai.configure(api_key=GEMINI_API_KEY)
+
     try:
-        client = OpenAI(api_key=OPENAI_API_KEY)
+        # Use gemini-pro or gemini-flash
+        model = genai.GenerativeModel('gemini-pro')
 
-        chat_completion = client.chat.completions.create(
-            model="gpt-3.5-turbo", # Recommended for free tier and performance
-            messages=[
-                {"role": "system", "content": "You are an expert aviation instructor. Explain any Air Traffic Control (ATC) or pilot phrase in simple, clear, and beginner-friendly English. Be concise and focus on the meaning relevant to flight operations."},
-                {"role": "user", "content": phrase}
-            ],
-            temperature=0.7, # Adjust creativity (0.0-1.0), lower for more factual
-            max_tokens=150 # Limit response length to keep it concise
-        )
+        # Construct the prompt for the AI
+        prompt = f"""
+        You are an expert aviation instructor. Explain the following Air Traffic Control (ATC) or ICAO phrase in simple, clear, and beginner-friendly English. Be concise and focus on the meaning relevant to flight operations.
 
-        explanation = chat_completion.choices[0].message.content
+        Phrase: "{phrase}"
+
+        Explanation:
+        """
+
+        # Make the API call to Gemini
+        response = model.generate_content(prompt)
+
+        # Extract the explanation text
+        explanation = response.text.strip()
+        if not explanation:
+            explanation = "No clear explanation found. The AI might not have understood the phrase."
 
         return {
             'statusCode': 200,
@@ -64,7 +73,7 @@ def handler(event, context):
         }
 
     except Exception as e:
-        print(f"An error occurred with OpenAI API: {e}")
+        print(f"An error occurred with Gemini API: {e}")
         return {
             'statusCode': 500,
             'headers': { "Content-Type": "application/json" },
